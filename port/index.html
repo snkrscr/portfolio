@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#100c18">
+  <meta name="description" content="Творческое портфолио — AI art, видеомонтаж, перевод и субтитры.">
+  <title>Портфолио</title>
+  <style>
+    :root {
+      --bg: #100c18; --panel: #191225; --panel2: #211832;
+      --text: #f3effa; --muted: #b5a9c8; --purple: #a77bea;
+      --lilac: #d5bfff; --line: rgba(213,191,255,.15);
+      --glow: rgba(139,91,202,.22); --radius: 22px;
+    }
+    html { scroll-behavior: smooth; scroll-padding-top: 86px; }
+    body {
+      margin: 0; color: var(--text); background:
+        radial-gradient(ellipse at 80% 5%, rgba(102,61,151,.22), transparent 34rem),
+        radial-gradient(ellipse at 5% 45%, rgba(73,48,111,.12), transparent 32rem), var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+      line-height: 1.6; overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .noise { position: fixed; inset: 0; pointer-events: none; opacity: .035; z-index: 5;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E"); }
+    .wrap { width: min(1120px, calc(100% - 44px)); margin: auto; }
+    header { position: fixed; inset: 0 0 auto; z-index: 20; border-bottom: 1px solid transparent;
+      transition: .3s; backdrop-filter: blur(16px); }
+    header.scrolled { background: rgba(16,12,24,.82); border-color: var(--line); }
+    .nav { height: 76px; display: flex; align-items: center; justify-content: flex-end; gap: 24px; }
+    .brand { font-size: 15px; font-weight: 800; letter-spacing: .2em; }
+    .brand span { color: var(--purple); }
+    nav { display: flex; gap: 28px; align-items: center; }
+    nav a { color: var(--muted); font-size: 13px; transition: color .2s; }
+    nav a:hover, nav a.active { color: var(--lilac); }
+    .nav-cta { border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; color: var(--lilac); }
+    .menu-btn { display: none; background: none; color: var(--text); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; }
+    .hero { min-height: 790px; display: grid; align-items: center; padding: 140px 0 90px; position: relative; }
+    .hero:after { content:""; position:absolute; width: 420px; height:420px; border-radius:50%; right: 4%; top: 20%;
+      background: radial-gradient(circle, rgba(142,93,205,.22), transparent 68%); filter: blur(12px); pointer-events:none; }
+    .hero-grid { display: grid; grid-template-columns: 1.12fr .88fr; align-items: center; gap: 55px; position: relative; z-index: 1; }
+    .eyebrow { color: var(--lilac); text-transform: uppercase; letter-spacing: .22em; font-size: 11px; font-weight: 700; }
+    h1 { font-size: clamp(54px, 8vw, 100px); line-height: .98; letter-spacing: -.065em; margin: 22px 0; }
+    h1 span { color: var(--purple); text-shadow: 0 0 38px var(--glow); }
+    .hero-copy { max-width: 520px; color: var(--muted); font-size: 17px; }
+    .hero-art { min-height: 430px; position:relative; border:1px solid var(--line); border-radius: 32px; overflow:hidden;
+      background: linear-gradient(145deg, rgba(147,103,202,.28), rgba(31,21,47,.6)); box-shadow: 0 30px 100px rgba(0,0,0,.35); }
+    .hero-art img[hidden] { display:none; }
+    .hero-art img { display:block; width:100%; height:100%; position:absolute; inset:0; object-fit:cover; }
+    .hero-art:after { content:"✦"; position:absolute; top:22px; right:25px; font-size:28px; color:var(--lilac); text-shadow:0 0 24px var(--purple); }
+    .float-tag { position:absolute; right:-12px; bottom:55px; background:rgba(32,23,47,.9); border:1px solid var(--line); padding:12px 16px; border-radius:14px; color:var(--lilac); font-size:11px; letter-spacing:.08em; }
+    section { padding: 105px 0; }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:30px; margin-bottom:35px; }
+    .section-head h2 { font-size: clamp(34px,5vw,54px); line-height:1; letter-spacing:-.045em; margin:12px 0 0; }
+    .section-head p { max-width:390px; color:var(--muted); margin:0; font-size:14px; }
+    .art-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .art-card { padding:0; color:inherit; font:inherit; text-align:left; width:100%; position:relative; border:1px solid var(--line); border-radius:18px; overflow:hidden; background:var(--panel); cursor:pointer; min-height:250px; transition:.35s; }
+    .art-card[hidden] { display:none; }
+    .art-card:focus-visible { outline:2px solid var(--lilac); outline-offset:3px; }
+    .art-card:hover { transform:translateY(-6px); border-color:rgba(133,184,246,.46); box-shadow:0 18px 45px rgba(0,0,0,.28),0 0 24px rgba(120,177,242,.08); }
+    .art-card img { width:100%; height:100%; min-height:250px; display:block; object-fit:cover; transition:transform .6s; }
+    .art-card:hover img { transform:scale(1.045); }
+    .art-card .placeholder { min-height:250px; display:grid; place-items:center; text-align:center; padding:20px;
+      background: radial-gradient(circle at 70% 20%, rgba(174,132,231,.35), transparent 38%), linear-gradient(135deg,#302044,#171120 70%); color:#d8c4f5; }
+    .placeholder strong { display:block; font-size:13px; letter-spacing:.16em; }
+    .placeholder small { color:#a99abf; font-size:11px; }
+    .empty-hint { color:var(--muted); font-size:14px; padding:28px 0; grid-column:1/-1; }
+    .video-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+    .video-card { border:1px solid var(--line); background:var(--panel); border-radius:var(--radius); overflow:hidden; transition:border-color .35s, box-shadow .35s; }
+    .video-card:hover { border-color:rgba(125,185,242,.35); box-shadow:0 0 22px rgba(105,145,220,.07); }
+    .video-frame { aspect-ratio:16/9; background:linear-gradient(135deg,#33224b,#14101d); display:grid; place-items:center; position:relative; }
+    .video-frame iframe { width:100%; height:100%; border:0; display:block; }
+    .video-frame video { width:100%; height:100%; object-fit:cover; display:block; }
+    .play-mark { width:58px; height:58px; display:grid; place-items:center; border-radius:50%; border:1px solid rgba(255,255,255,.35); background:rgba(16,12,24,.5); color:white; font-size:20px; }
+    .video-info { padding:20px; }
+    .video-info h3 { margin:0 0 8px; font-size:17px; }
+    .video-info p { margin:0; color:var(--muted); font-size:13px; }
+    .tags { display:flex; gap:7px; flex-wrap:wrap; margin-top:15px; }
+    .tags span { color:var(--lilac); background:rgba(167,123,234,.12); border:1px solid rgba(167,123,234,.18); border-radius:999px; padding:5px 9px; font-size:10px; }
+    .about-grid { display:grid; grid-template-columns:.8fr 1.2fr; gap:45px; }
+    .about-panel { background:linear-gradient(145deg,rgba(124,82,174,.17),rgba(25,18,37,.9)); border:1px solid var(--line); border-radius:var(--radius); padding:28px; }
+    .about-panel h3 { margin:0 0 12px; font-size:22px; }
+    .about-panel p { color:var(--muted); font-size:14px; }
+    .skills { display:flex; flex-wrap:wrap; gap:9px; margin-top:20px; }
+    .skills span { border:1px solid var(--line); padding:8px 12px; border-radius:10px; color:#d7c8e9; font-size:12px; }
+    .contact { border:1px solid var(--line); border-radius:28px; padding:38px; display:flex; justify-content:space-between; align-items:center; gap:25px;
+      background:radial-gradient(ellipse at 90% 0%,rgba(128,80,181,.2),transparent 50%),var(--panel); }
+    .contact h2 { margin:8px 0; font-size:clamp(30px,4vw,45px); letter-spacing:-.04em; }
+    .contact p { color:var(--muted); margin:0; }
+    .contact-icons { display:flex; align-items:center; gap:16px; }
+    .contact-icon { width:64px; height:64px; display:grid; place-items:center; border-radius:18px; border:1px solid var(--line); background:rgba(139,95,196,.1); color:var(--lilac); transition:transform .25s, border-color .25s, box-shadow .25s; }
+    .contact-icon:hover { transform:translateY(-4px); border-color:var(--lilac); box-shadow:0 0 24px rgba(139,95,196,.19); }
+    .contact-icon svg { width:28px; height:28px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+    .contact-icon:focus-visible { outline:2px solid var(--lilac); outline-offset:4px; }
+    @media (max-width:700px) { .contact-icons { margin-top:22px; } }
+    footer { padding:30px 0 45px; color:#837693; font-size:11px; display:flex; justify-content:space-between; gap:20px; }
+    .reveal { opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity:1; transform:none; }
+    .lightbox { position:fixed; inset:0; z-index:50; background:rgba(7,5,11,.94); display:none; align-items:center; justify-content:center; padding:30px; }
+    .lightbox.open { display:flex; animation:fade .2s ease; }
+    .lightbox img { max-width:min(1100px,92vw); max-height:84vh; object-fit:contain; border-radius:12px; box-shadow:0 20px 90px #000; }
+    .lightbox button { position:absolute; background:rgba(24,17,38,.78); border:1px solid rgba(196,173,239,.32); color:white; border-radius:50%; width:44px; height:44px; cursor:pointer; font-size:22px; display:grid; place-items:center; transition:background .2s,border-color .2s; }
+    .lightbox button:hover { background:rgba(81,55,116,.88); border-color:var(--lilac); }
+    .lightbox button:focus-visible { outline:2px solid var(--lilac); outline-offset:3px; }
+    #closeLightbox { top:20px; right:24px; }
+    .lightbox .gallery-arrow { top:50%; transform:translateY(-50%); z-index:2; }
+    #galleryPrev { left:clamp(10px,3vw,42px); }
+    #galleryNext { right:clamp(10px,3vw,42px); }
+    .gallery-count { position:absolute; bottom:22px; left:50%; transform:translateX(-50%); color:#c7b7df; font-size:12px; letter-spacing:.12em; }
+    @media (max-width:600px) { .lightbox { padding:58px 12px 66px; } .lightbox img { max-width:100%; max-height:76vh; } .lightbox .gallery-arrow { top:auto; bottom:12px; transform:none; } #galleryPrev { left:20px; } #galleryNext { right:20px; } .gallery-count { bottom:27px; } }
+
+    .hero-art { isolation:isolate; }
+    .hero-art .infinity-orbit { position:absolute; width:72%; aspect-ratio:1; top:7%; left:14%; border:1px solid rgba(153,202,255,.16); border-radius:50%; pointer-events:none; box-shadow:0 0 28px rgba(133,182,248,.07),inset 0 0 28px rgba(133,182,248,.04); transform:rotate(-18deg); }
+    .hero-art .infinity-orbit::after { content:""; position:absolute; inset:12%; border:1px solid rgba(191,159,255,.11); border-radius:50%; }
+    .hero-art:hover .infinity-orbit { border-color:rgba(153,202,255,.26); }
+    .hero h1 span { text-shadow:0 0 38px var(--glow),0 0 65px rgba(110,172,255,.07); }
+    .secret-trigger { appearance:none; border:0; background:none; color:#837693; padding:4px 8px; cursor:pointer; font-size:16px; line-height:1; opacity:.62; transition:opacity .25s,color .25s,text-shadow .25s; }
+    .secret-trigger:hover,.secret-trigger:focus-visible { opacity:1; color:#a8c9ff; text-shadow:0 0 14px rgba(139,185,255,.5); }
+    .domain-overlay { position:fixed; inset:0; z-index:90; pointer-events:none; opacity:0; visibility:hidden; transition:opacity .8s ease,visibility .8s; display:grid; place-items:center; background:radial-gradient(ellipse at center,rgba(40,48,92,.88),rgba(9,9,29,.97) 65%,#070711); overflow:hidden; }
+    .domain-overlay.active { opacity:1; visibility:visible; }
+    .domain-overlay::before { content:""; position:absolute; inset:-50%; background:repeating-radial-gradient(circle at center,transparent 0 55px,rgba(143,184,255,.09) 56px,transparent 57px 115px); animation:domain-drift 16s linear infinite; }
+    .domain-overlay::after { content:""; position:absolute; inset:0; background-image:radial-gradient(1px 1px at 15% 22%,#b8c9ff 90%,transparent),radial-gradient(2px 2px at 74% 38%,#d6bfff 90%,transparent),radial-gradient(1px 1px at 42% 78%,#d2e4ff 90%,transparent),radial-gradient(1px 1px at 85% 82%,#a7bfff 90%,transparent),radial-gradient(2px 2px at 28% 55%,#d9c7ff 90%,transparent); opacity:.6; background-size:310px 260px; }
+    .domain-message { position:relative; z-index:1; text-align:center; padding:24px; font-size:clamp(19px,3vw,34px); letter-spacing:.06em; color:#e5e8ff; text-shadow:0 0 35px rgba(154,188,255,.45); }
+    .domain-message small { display:block; font-size:11px; letter-spacing:.3em; color:#a5b9e3; margin-bottom:18px; }
+    @keyframes domain-drift { to { transform:rotate(360deg); } }
+    @media (prefers-reduced-motion:reduce) { .domain-overlay::before { animation:none; } .domain-overlay,.art-card,.video-card { transition:none; } }
+    @keyframes fade { from{opacity:0} to{opacity:1} }
+    @media(max-width:800px) {
+      .hero-grid,.about-grid { grid-template-columns:1fr; }
+      .hero { min-height:auto; padding-top:125px; }
+      .hero-art { min-height:340px; }
+      .art-grid { grid-template-columns:repeat(2,1fr); }
+      .section-head { display:block; }
+      .section-head p { margin-top:15px; }
+      nav { display:none; position:absolute; top:76px; left:0; right:0; padding:18px 22px 24px; background:rgba(16,12,24,.97); border-bottom:1px solid var(--line); flex-direction:column; align-items:flex-start; }
+      nav.open { display:flex; }
+      .menu-btn { display:block; }
+      .nav-cta { display:none; }
+    }
+    @media(max-width:540px) {
+      .wrap { width:min(100% - 30px,1120px); }
+      .art-grid,.video-grid { grid-template-columns:1fr; }
+      .art-card,.art-card img,.art-card .placeholder { min-height:290px; }
+      section { padding:75px 0; }
+      .contact { padding:25px; display:block; }
+      .contact .btn { margin-top:20px; }
+      footer { display:block; }
+    }
+
+    .about-intro { padding:34px 36px; margin-bottom:18px; }
+    .about-intro h3 { font-size:clamp(23px,3vw,33px); letter-spacing:-.035em; margin:0 0 12px; color:var(--text); }
+    .about-intro p { margin:0; max-width:790px; font-size:15px; line-height:1.8; }
+    .about-facts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    .about-fact { background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:26px 28px; min-height:146px; display:flex; flex-direction:column; align-items:flex-start; gap:5px; transition:border-color .25s,box-shadow .25s; }
+    .about-fact:hover { border-color:rgba(133,184,246,.3); box-shadow:0 0 22px rgba(105,145,220,.055); }
+    .about-fact-label { font-size:11px; letter-spacing:.09em; text-transform:uppercase; color:var(--lilac); margin-bottom:10px; }
+    .about-fact strong { font-size:19px; font-weight:650; line-height:1.3; }
+    .about-fact span { color:var(--muted); font-size:13px; line-height:1.5; }
+    @media(max-width:600px) { .about-facts { grid-template-columns:1fr; } .about-intro { padding:26px 24px; } .about-fact { min-height:unset; padding:23px 24px; } }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <header id="header">
+    <div class="wrap nav">
+      
+      <nav id="nav">
+        <a href="#art">AI-арты</a><a href="#video">Видео</a><a href="#about">Обо мне</a><a href="#contact">Контакты</a>
+      </nav>
+      
+      <button class="menu-btn" id="menuBtn" aria-label="Открыть меню">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="wrap hero-grid">
+        <div class="reveal">
+          <div class="eyebrow">Портфолио / 2026</div>
+          <h1>МОЁ<br><span>ТВОРЧЕСТВО</span></h1>
+          <p class="hero-copy">Привет, я Денис. Создаю AI-арты, занимаюсь видеомонтажом, переводом и оформлением субтитров. Здесь собраны мои проекты, эксперименты и творческие работы — всё, над чем я работал и чем хочу поделиться. Буду рад новым идеям и интересным проектам!</p>
+        </div>
+        <div class="hero-art reveal"><img id="heroImage" alt="Главный арт" hidden><div class="infinity-orbit" aria-hidden="true"></div><div class="float-tag">AI-АРТЫ · ВИДЕО · ПРОЕКТЫ</div></div>
+      </div>
+    </section>
+
+    <section id="art">
+      <div class="wrap">
+        <div class="section-head reveal"><div><div class="eyebrow">01 / Визуальные эксперименты</div><h2>AI Art<span style="color:var(--purple)">.</span></h2></div><p>Здесь собраны мои AI-арты. Создаю их с помощью Stable Diffusion через веб-интерфейс AUTOMATIC1111, экспериментируя с разными стилями, идеями и настроениями. Нажми на изображение, чтобы рассмотреть его поближе.</p></div>
+        <div class="art-grid" id="artGrid"></div>
+      </div>
+    </section>
+
+    <section id="video">
+      <div class="wrap">
+        <div class="section-head reveal"><div><div class="eyebrow">02 / Монтаж и локализация</div><h2>Видео<span style="color:var(--purple)">.</span></h2></div><p>Здесь собраны видео, над которыми я работал: занимался монтажом и переводом субтитров на русский язык.</p></div>
+        <div class="video-grid" id="videoGrid"></div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="wrap">
+        <div class="section-head reveal">
+          <div><div class="eyebrow">03 / Об авторе</div><h2>Обо мне</h2></div>
+        </div>
+        <div class="about-intro about-panel reveal">
+          <h3>Коростелев Денис Иванович</h3>
+          <p>Моя основная работа связана с БПЛА: занимаюсь их управлением, обслуживанием, ремонтом и прошивкой. В свободное время увлекаюсь AI-артами, видеомонтажом и переводами.</p>
+        </div>
+        <div class="about-facts">
+          <div class="about-fact reveal"><div class="about-fact-label">Образование</div><strong>Высшее</strong><span>РУТ (МИИТ), Москва</span><span>Экономическая безопасность</span></div>
+          <div class="about-fact reveal"><div class="about-fact-label">Опыт работы</div><strong>6 лет</strong></div>
+          <div class="about-fact reveal"><div class="about-fact-label">Текущая работа</div><strong>Оператор БПЛА</strong></div>
+          <div class="about-fact reveal"><div class="about-fact-label">Инструменты и навыки</div><span><b>ИИ-инструменты:</b> LLM, Stable Diffusion</span><span><b>Автоматизация:</b> Excel, VBA (базовый)</span><span><b>Программирование:</b> JavaScript (базовый)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap">
+        <div class="contact reveal">
+          <div><div class="eyebrow">04 / Контакты</div><h2>Контакты</h2></div>
+          <div class="contact-icons">
+            <a class="contact-icon" href="https://t.me/triplesnikers" target="_blank" rel="noopener noreferrer" aria-label="Telegram: @triplesnikers" title="Telegram: @triplesnikers">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.5 3.5 2.8 10.7c-.9.4-.9 1.2.1 1.5l4.8 1.5 1.9 5.8c.3.9 1.1 1 1.6.4l2.7-3.1 4.8 3.5c.8.6 1.5.3 1.7-.7l2.1-14.5c.2-1.2-.3-1.8-1-1.6Z"/><path d="m7.7 13.7 11.8-8.1-9.9 13.9"/></svg>
+            </a>
+            <a class="contact-icon" href="mailto:imsnikers@gmail.com" aria-label="Почта: imsnikers@gmail.com" title="Почта: imsnikers@gmail.com">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m3.5 7 8.5 6.5L20.5 7"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="wrap"><span>© 2026 Денис · Портфолио</span><span><button class="secret-trigger" id="secretTrigger" type="button" aria-label="Секретный символ" title="∞">∞</button></span></footer>
+
+  <div class="domain-overlay" id="domainOverlay" aria-hidden="true"><div class="domain-message"><small>∞ / SECRET UNLOCKED</small>Территория AI — необъятная пустота</div></div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр изображения" tabindex="-1">
+    <button id="closeLightbox" aria-label="Закрыть галерею" type="button">×</button>
+    <button class="gallery-arrow" id="galleryPrev" aria-label="Предыдущее изображение" type="button">‹</button>
+    <img id="lightboxImg" alt="">
+    <button class="gallery-arrow" id="galleryNext" aria-label="Следующее изображение" type="button">›</button>
+    <div class="gallery-count" id="galleryCount" aria-live="polite"></div>
+  </div>
+  <script>
+    const heroImage = "fri.png";
+
+    const artworks = [
+      "clr.png",
+      "miyabi.png",
+      "nek.png",
+      "red.png",
+      "tao.png",
+      "mav.png",
+      "chb.png",
+      "ciri.jpg",
+      "mad.jpg",
+      "city.png",
+      "satoru.png",
+      "mita.jpg",
+
+
+    ];
+
+    const videos = [
+      "https://www.youtube.com/watch?v=WR7OMoy5R3o",
+      "https://www.youtube.com/watch?v=_PXJnFJevOI&list=PLTxFn9MNhPlHm8xzTh04A-lC7drEFePFB&index=2",
+      "https://www.youtube.com/watch?v=Tuc_T0UZcLA&list=PLTxFn9MNhPlHm8xzTh04A-lC7drEFePFB&index=6",
+      "https://www.youtube.com/watch?v=Z3nk0PkG2XY&list=PLTxFn9MNhPlHm8xzTh04A-lC7drEFePFB&index=3",
+      "https://www.youtube.com/watch?v=obhiQas05AE&list=PLTxFn9MNhPlHm8xzTh04A-lC7drEFePFB&index=4",
+      "https://www.youtube.com/watch?v=_Q7vdwrxffo&list=PLTxFn9MNhPlHm8xzTh04A-lC7drEFePFB&index=7",
+    ];
+
+    function youtubeId(link) {
+      try {
+        const url = new URL(link);
+        const host = url.hostname.toLowerCase();
+        let id = null;
+        if (host === 'youtu.be' || host === 'www.youtu.be') id = url.pathname.split('/')[1];
+        else if (['youtube.com','www.youtube.com','m.youtube.com','music.youtube.com','youtube-nocookie.com','www.youtube-nocookie.com'].includes(host)) {
+          if (url.pathname === '/watch') id = url.searchParams.get('v');
+          else if (/^\/(shorts|embed|live)\//.test(url.pathname)) id = url.pathname.split('/')[2];
+        }
+        return /^[a-zA-Z0-9_-]{11}$/.test(id || '') ? id : null;
+      } catch { return null; }
+    }
+
+    const heroImg = document.getElementById('heroImage');
+    if (heroImage.trim()) {
+      heroImg.src = 'assets/images/' + heroImage.trim().split('/').map(encodeURIComponent).join('/');
+      heroImg.hidden = false;
+      heroImg.addEventListener('error', () => { heroImg.hidden = true; });
+    }
+
+    const artGrid = document.getElementById('artGrid');
+    const videoGrid = document.getElementById('videoGrid');
+    artworks.forEach((filename, index) => {
+      if (typeof filename !== 'string' || !filename.trim()) return;
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'art-card reveal';
+      card.setAttribute('aria-label', `Открыть арт ${index + 1}`);
+      const img = document.createElement('img');
+      img.src = 'assets/images/' + filename.trim().split('/').map(encodeURIComponent).join('/');
+      img.alt = `AI-арт ${index + 1}`;
+      img.loading = 'lazy';
+      img.addEventListener('error', () => { card.hidden = true; });
+      card.appendChild(img);
+      artGrid.appendChild(card);
+    });
+    videos.forEach(link => {
+      const id = youtubeId(link);
+      if (!id) return;
+      const card = document.createElement('article');
+      card.className = 'video-card reveal';
+      const frame = document.createElement('div');
+      frame.className = 'video-frame';
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + id;
+      iframe.title = 'Видео с YouTube';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      frame.appendChild(iframe);
+      card.appendChild(frame);
+      videoGrid.appendChild(card);
+    });
+
+    if (!artGrid.children.length) {
+      const hint = document.createElement('p');
+      hint.className = 'empty-hint';
+      hint.textContent = 'Здесь скоро появятся AI-арты';
+      artGrid.appendChild(hint);
+    }
+    if (!videoGrid.children.length) {
+      const hint = document.createElement('p');
+      hint.className = 'empty-hint';
+      hint.textContent = 'Здесь скоро появятся видео';
+      videoGrid.appendChild(hint);
+    }
+
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 20));
+    const menuBtn = document.getElementById('menuBtn'), nav = document.getElementById('nav');
+    menuBtn.addEventListener('click', () => nav.classList.toggle('open'));
+    nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nav.classList.remove('open')));
+
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
+    }), { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const galleryCount = document.getElementById('galleryCount');
+    const galleryPrev = document.getElementById('galleryPrev');
+    const galleryNext = document.getElementById('galleryNext');
+    const artCards = [...document.querySelectorAll('.art-card')];
+    let galleryImages = [], currentImage = 0, lastFocused = null;
+    let touchStartX = null, touchStartY = null;
+    function showGalleryImage(index) {
+      if (!galleryImages.length) return;
+      currentImage = (index + galleryImages.length) % galleryImages.length;
+      const item = galleryImages[currentImage];
+      lightboxImg.src = item.src;
+      lightboxImg.alt = item.title;
+      galleryCount.textContent = `${currentImage + 1} / ${galleryImages.length}`;
+      galleryPrev.hidden = galleryNext.hidden = galleryImages.length < 2;
+    }
+    artCards.forEach(card => card.addEventListener('click', () => {
+      galleryImages = artCards.map(c => ({ img:c.querySelector('img'), title:c.dataset.title || c.querySelector('img')?.alt || 'Арт' }))
+        .filter(item => item.img && !item.img.closest('[hidden]'))
+        .map(item => ({ src:item.img.src, title:item.title }));
+      const clickedImg = card.querySelector('img');
+      if (!clickedImg || card.hidden) return;
+      const selected = galleryImages.findIndex(item => item.src === clickedImg.src);
+      if (selected < 0) return;
+      lastFocused = document.activeElement;
+      showGalleryImage(selected);
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('closeLightbox').focus();
+    }));
+    function closeLightbox() {
+      if (!lightbox.classList.contains('open')) return;
+      lightbox.classList.remove('open');
+      lightboxImg.removeAttribute('src');
+      document.body.style.overflow = '';
+      if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+    }
+    document.getElementById('closeLightbox').addEventListener('click', closeLightbox);
+    galleryPrev.addEventListener('click', () => showGalleryImage(currentImage - 1));
+    galleryNext.addEventListener('click', () => showGalleryImage(currentImage + 1));
+    lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', e => {
+      if (!lightbox.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') { e.preventDefault(); showGalleryImage(currentImage - 1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); showGalleryImage(currentImage + 1); }
+      if (e.key === 'Tab') {
+        const controls = [document.getElementById('closeLightbox'),galleryPrev,galleryNext].filter(b => !b.hidden);
+        const i = controls.indexOf(document.activeElement);
+        e.preventDefault();
+        controls[(i + (e.shiftKey ? controls.length - 1 : 1)) % controls.length].focus();
+      }
+    });
+    lightbox.addEventListener('touchstart', e => {
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, {passive:true});
+    lightbox.addEventListener('touchend', e => {
+      if (touchStartX === null || !e.changedTouches.length) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      touchStartX = touchStartY = null;
+      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.25) showGalleryImage(currentImage + (dx < 0 ? 1 : -1));
+    }, {passive:true});
+    const secretTrigger = document.getElementById('secretTrigger');
+    const domainOverlay = document.getElementById('domainOverlay');
+    let secretClicks = 0, domainTimeout;
+    secretTrigger.addEventListener('click', () => {
+      secretClicks += 1;
+      if (secretClicks < 5) return;
+      secretClicks = 0;
+      domainOverlay.classList.add('active');
+      domainOverlay.setAttribute('aria-hidden', 'false');
+      clearTimeout(domainTimeout);
+      domainTimeout = setTimeout(() => {
+        domainOverlay.classList.remove('active');
+        domainOverlay.setAttribute('aria-hidden', 'true');
+      }, 3800);
+    });
+  </script>
+</body>
+</html>
